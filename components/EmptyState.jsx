@@ -16,7 +16,7 @@ const EmptyState = () => {
         No photo found
       </Text>
       <CustomButton
-        title="Create One?"
+        title="CREATE ONE?"
         handlePress={() => router.push('/create')}
         containerStyles="w-full mt-5 border-2 border-grey bg-white rounded-lg"
       />

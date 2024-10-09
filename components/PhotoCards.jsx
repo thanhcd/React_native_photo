@@ -37,10 +37,9 @@ const PhotoCards = ({ posts }) => {
 
         {visibleCount < posts.length && (
           <CustomButton
-            title="Show more"
+            title="SHOW MORE"
             handlePress={handleShowMore}
-            containerStyles="mt-7"
-            textStyles="text-white"
+            containerStyles="w-full mt-7 border-2 border-grey bg-white rounded-lg"
           />
         )}
       </ScrollView>

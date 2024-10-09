@@ -133,10 +133,10 @@ const Create = () => {
         />
 
         <CustomButton
-          title="Submit"
+          title="SUBMIT"
           handlePress={submit}
-          containerStyles="mt-7 rounded-lg"
-          textStyles="text-white"
+          containerStyles="w-full mt-5 border-2 border-grey bg-white rounded-lg"
+          textStyles="text-black"
           isLoading={uploading}
         />
       </ScrollView>

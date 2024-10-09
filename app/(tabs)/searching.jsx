@@ -39,11 +39,7 @@ const Search = () => {
         ListEmptyComponent={() => <EmptyState />}
       />
     </SafeAreaView>
-    // <SafeAreaView className="h-full pt-10">
-    //   <View>
-    //     <Text>hello</Text>
-    //   </View>
-    // </SafeAreaView>
+
   );
 };
 
