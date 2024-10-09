@@ -20,12 +20,12 @@ const SearchCards = ({ posts }) => {
           {posts.map((post, index) => (
             <TouchableOpacity
               key={index}
-              className="w-[33.33%] " // Chiếm 33.33% chiều rộng và thêm padding cho các ảnh
+              className="w-[100%] " // Chiếm 33.33% chiều rộng và thêm padding cho các ảnh
               onPress={() => setSelectedImage(post)} // Khi nhấn vào ảnh, lưu ảnh đã chọn
             >
               <Image
                 source={{ uri: post.thumbnail }}
-                className="w-full h-[150px]" // Đặt chiều cao cố định cho ảnh
+                className="w-full h-[300px]" // Đặt chiều cao cố định cho ảnh
                 resizeMode="cover"
               />
             </TouchableOpacity>
