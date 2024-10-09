@@ -4,13 +4,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import FormField from "../../components/FormField";
 import { icons } from "../../constants";
 import CustomButton from "../../components/CustomButton";
-import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
 import { createPhoto } from "../../lib/appwrite";
-import {useGlobalContext} from "../../context/GlobalProvider";
+import { useGlobalContext } from "../../context/GlobalProvider";
 
-const create = () => {
+const Create = () => {
   const { user } = useGlobalContext();
+  // Kiểm tra nếu user là undefined
+  if (!user) {
+    Alert.alert("User not found", "Please log in again.");
+    return null; // Hoặc có thể return một cái gì đó khác để ngăn không cho render
+  }
+
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
     title: "",
@@ -18,35 +24,52 @@ const create = () => {
     prompt: null,
   });
 
-  const openPicker = async (selectType) => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: selectType === "image" ? ["image/png", "image/jpg"] : ["video/mp4"],
+  // Hàm mở ImagePicker để chọn ảnh
+  const openPicker = async () => {
+    // Kiểm tra quyền truy cập
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
 
-    // Check if the user has selected a file and update the form's thumbnail
+    // Kiểm tra xem người dùng đã chọn ảnh chưa và cập nhật thumbnail
     if (!result.canceled) {
-      if (selectType === "image") {
-        setForm({ ...form, thumbnail: result.assets[0] });
-      }
+      setForm({ ...form, thumbnail: result.assets[0] });
     } else {
-      setTimeout(() => {
-        Alert.alert("Document picked", JSON.stringify(result, null, 2));
-      }, 100);
+      Alert.alert("Image picking was canceled.");
     }
   };
 
   const submit = async () => {
+    console.log("Form values:", form); // In giá trị của form ra để kiểm tra
+  
     if (!form.prompt || !form.thumbnail || !form.title) {
       Alert.alert("Please fill all the fields");
+      return; // Thoát khỏi hàm nếu có trường không hợp lệ
     }
+  
+    if (!user || !user.$id) {
+      Alert.alert("User not found", "Please log in again.");
+      return; // Thoát khỏi hàm nếu không có user
+    }
+  
     setUploading(true);
     try {
       await createPhoto({
-        ...form, userId: user.$id
-      })
-
+        ...form,
+        userId: user.$id,
+      });
+  
       Alert.alert("Success", "Post uploaded");
-      router.push('/home')
+      router.push('/home');
     } catch (error) {
       Alert.alert("Error", error.message);
     } finally {
@@ -55,9 +78,10 @@ const create = () => {
         thumbnail: null,
         prompt: null,
       });
-      setUploading(false)
+      setUploading(false);
     }
   };
+  
 
   return (
     <SafeAreaView className="h-full px-4 pt-10">
@@ -73,7 +97,7 @@ const create = () => {
         />
         <View className="mt-7 space-y-2">
           <Text className="text-base font-cmedium">Upload photo</Text>
-          <TouchableOpacity onPress={() => openPicker("image")}>
+          <TouchableOpacity onPress={openPicker}>
             {form.thumbnail ? (
               <Image
                 source={{ uri: form.thumbnail.uri }}
@@ -113,4 +137,4 @@ const create = () => {
   );
 };
 
-export default create;
+export default Create;
