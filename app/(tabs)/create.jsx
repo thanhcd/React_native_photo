@@ -1,10 +1,17 @@
-import { View, Text, TouchableOpacity, Image, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Alert,
+  ScrollView,
+} from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FormField from "../../components/FormField";
 import { icons } from "../../constants";
 import CustomButton from "../../components/CustomButton";
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { createPhoto } from "../../lib/appwrite";
 import { useGlobalContext } from "../../context/GlobalProvider";
@@ -27,7 +34,8 @@ const Create = () => {
   // Hàm mở ImagePicker để chọn ảnh
   const openPicker = async () => {
     // Kiểm tra quyền truy cập
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
       Alert.alert("Permission to access camera roll is required!");
       return;
@@ -50,26 +58,26 @@ const Create = () => {
 
   const submit = async () => {
     console.log("Form values:", form); // In giá trị của form ra để kiểm tra
-  
+
     if (!form.prompt || !form.thumbnail || !form.title) {
       Alert.alert("Please fill all the fields");
       return; // Thoát khỏi hàm nếu có trường không hợp lệ
     }
-  
+
     if (!user || !user.$id) {
       Alert.alert("User not found", "Please log in again.");
       return; // Thoát khỏi hàm nếu không có user
     }
-  
+
     setUploading(true);
     try {
       await createPhoto({
         ...form,
         userId: user.$id,
       });
-  
+
       Alert.alert("Success", "Post uploaded");
-      router.push('/home');
+      router.push("/home");
     } catch (error) {
       Alert.alert("Error", error.message);
     } finally {
@@ -81,11 +89,10 @@ const Create = () => {
       setUploading(false);
     }
   };
-  
 
   return (
     <SafeAreaView className="h-full px-4 pt-10">
-      <View>
+      <ScrollView>
         <Text className="text-4xl text-black font-cbold">Create</Text>
         <Text className="text-base font-cregular"> your photo post</Text>
         <FormField
@@ -132,7 +139,7 @@ const Create = () => {
           textStyles="text-white"
           isLoading={uploading}
         />
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
