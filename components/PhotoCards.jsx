@@ -5,7 +5,6 @@ import { icons } from "../constants";
 
 const PhotoCards = ({ posts }) => {
   const [selectedImage, setSelectedImage] = useState(null); // Trạng thái để lưu ảnh đã chọn
-  console.log("PhotoCards rendered with posts:", posts); // Thêm log để kiểm tra
   return (
     
     <>

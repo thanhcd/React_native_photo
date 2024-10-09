@@ -1,18 +1,26 @@
-import { View, ScrollView, Image, TouchableOpacity, Modal, Text } from "react-native";
+import {
+  View,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Modal,
+  Text,
+} from "react-native";
 import React, { useState } from "react";
 import { icons } from "../constants";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const SearchCards = ({ posts }) => {
   const [selectedImage, setSelectedImage] = useState(null); // Trạng thái để lưu ảnh đã chọn
 
   return (
-    <>
+    <SafeAreaView>
       <ScrollView showsHorizontalScrollIndicator={false}>
         <View className="flex-row">
           {posts.map((post, index) => (
             <TouchableOpacity
               key={index}
-              className="w-[33.33%] py-1" // Chiếm 33.33% chiều rộng và thêm padding cho các ảnh
+              className="w-[33.33%] " // Chiếm 33.33% chiều rộng và thêm padding cho các ảnh
               onPress={() => setSelectedImage(post)} // Khi nhấn vào ảnh, lưu ảnh đã chọn
             >
               <Image
@@ -46,10 +54,12 @@ const SearchCards = ({ posts }) => {
                 />
                 <View className="flex-col px-2 py-1">
                   <Text className="font-bold text-white">
-                    {selectedImage.creator.username} {/* Sử dụng selectedImage */}
+                    {selectedImage.creator.username}{" "}
+                    {/* Sử dụng selectedImage */}
                   </Text>
                   <Text className="w-full break-words text-white">
-                    {selectedImage.creator.email.split("@")[0]}@ {/* Sử dụng selectedImage */}
+                    {selectedImage.creator.email.split("@")[0]}@{" "}
+                    {/* Sử dụng selectedImage */}
                   </Text>
                 </View>
               </View>
@@ -59,15 +69,13 @@ const SearchCards = ({ posts }) => {
                 className="absolute right-5 top-5" // Đặt nút ở bên phải
                 onPress={() => setSelectedImage(null)} // Đóng modal
               >
-                <Image
-                  source={icons.x}
-                />
+                <Image source={icons.x} />
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
       )}
-    </>
+    </SafeAreaView>
   );
 };
 
