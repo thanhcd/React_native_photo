@@ -1,42 +1,61 @@
-import { Text, View, Image, FlatList, ScrollView } from "react-native";
-import React, {} from "react";
+import { Text, View, Image, FlatList, ScrollView, TouchableOpacity } from "react-native";
+import React from "react";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getUserPosts } from "../../lib/appwrite";
+import { getUserPosts, signOut } from "../../lib/appwrite";
 import useAppwrite from "../../lib/useAppwrite";
 import PhotoCards from "../../components/PhotoCards";
 import InfoBox from "../../components/InfoBox";
 import Trending from "../../components/Trending";
+import { icons } from "../../constants";
+import { router } from "expo-router";
 
 const Profile = () => {
-  const { user } = useGlobalContext(); // Lấy thông tin người dùng từ context
-  const userId = user ? user.$id : null; // Lưu userId
+  const { user, setUser, setIsLogged} = useGlobalContext(); // Lấy thông tin người dùng từ context
 
-  const { data: posts = [], refetch } = useAppwrite(() => getUserPosts(userId));
+  // const { data: posts = [], refetch } = useAppwrite(() =>
+  //   getUserPosts(user.$id)
+  // );
 
-  console.log("User ID:", userId); // Log userId để kiểm tra
-  console.log("Fetched Posts:", posts); // Log bài viết để kiểm tra
+  const logout = async () => {
+    await signOut();
+    setUser(null);
+    setIsLogged(false)
+
+    router.replace("/login");
+  };
 
   return (
-    <View className="h-full py-20 flex items-center">
+    <SafeAreaView className="h-full my-10">
       {user ? (
-        <SafeAreaView className="flex-col items-center mt-3">
+        <View className="mt-3">
+          <TouchableOpacity
+            className="w-full items-end mb-6 px-4"
+            onPress={logout}
+          >
+            <Image
+              source={icons.logout}
+              className="w-6 h-6"
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+
           <InfoBox user={user} />
 
-          {posts.length > 0 ? (
+          {/* {posts.length > 0 ? (
             <FlatList
               data={posts}
               keyExtractor={(item) => item.$id}
               renderItem={({ item }) => <Trending posts={posts} />}
             />
           ) : (
-            <Text>No posts available</Text> // Thông báo không có bài đăng
-          )}
-        </SafeAreaView>
+            <Text className="text-center">No posts available</Text> // Thông báo không có bài đăng
+          )} */}
+        </View>
       ) : (
         <Text className="text-xl mt-4">Loading user...</Text>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
