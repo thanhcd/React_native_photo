@@ -17,6 +17,7 @@ import useAppwrite from "../../lib/useAppwrite";
 import PhotoCards from "../../components/PhotoCards";
 
 const Home = () => {
+
   const { data: posts, refetch } = useAppwrite(getAllPosts);
   const [refreshing, setRefreshing] = useState(false);
   const { data: latestPost } = useAppwrite(getLatestPosts);

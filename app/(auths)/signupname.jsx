@@ -13,11 +13,15 @@ import { icons } from "../../constants";
 import CustomButton from "../../components/CustomButton";
 import { createUser } from "../../lib/appwrite";
 import { useLocalSearchParams, router } from "expo-router";
+import { useGlobalContext } from "../../context/GlobalProvider";
 
 const signupname = () => {
+  const { setUser, setIsLogged } = useGlobalContext()
   const { email, password } = useLocalSearchParams(); // Nhận params từ trang trước
-  console.log("Email:", email);
-  console.log("Password:", password);
+  // console.log("Email:", email);
+  // console.log("Password:", password);
+
+  
   const [form, setForm] = useState({
     email: email || "", // Sử dụng email từ params
     password: password || "", // Sử dụng password từ params
@@ -27,7 +31,7 @@ const signupname = () => {
   const [isSubmiting, setIssubmiting] = useState(false);
 
   const submit = async () => {
-    console.log("Form Values:", form); // Log giá trị của form
+    // console.log("Form Values:", form); // Log giá trị của form
     
     if (!form.username || !form.email || !form.password) {
       Alert.alert("Error", "please fill all the fields");
@@ -39,7 +43,10 @@ const signupname = () => {
     
     try {
       const result = await createUser(form.email, form.password, form.username);
-      console.log("User Created:", result); // Log kết quả khi người dùng được tạo thành công
+      // console.log("User Created:", result); // Log kết quả khi người dùng được tạo thành công
+      setUser(result);
+      setIsLogged(true);
+
       router.replace("/home");
       return result;
     } catch (error) {
