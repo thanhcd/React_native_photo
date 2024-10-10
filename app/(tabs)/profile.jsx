@@ -1,26 +1,30 @@
-import { Text, View, Image, FlatList, ScrollView, TouchableOpacity } from "react-native";
+import {
+  Text,
+  View,
+  Image,
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getUserPosts, signOut } from "../../lib/appwrite";
 import useAppwrite from "../../lib/useAppwrite";
-import PhotoCards from "../../components/PhotoCards";
 import InfoBox from "../../components/InfoBox";
 import Trending from "../../components/Trending";
 import { icons } from "../../constants";
 import { router } from "expo-router";
 
 const Profile = () => {
-  const { user, setUser, setIsLogged} = useGlobalContext(); // Lấy thông tin người dùng từ context
+  const { user, setUser, setIsLogged } = useGlobalContext(); // Lấy thông tin người dùng từ context
 
-  // const { data: posts = [], refetch } = useAppwrite(() =>
-  //   getUserPosts(user.$id)
-  // );
-
+  const { data: posts } = useAppwrite(() => getUserPosts(user.$id));
+  console.log("duwxl iêu", posts)
   const logout = async () => {
     await signOut();
     setUser(null);
-    setIsLogged(false)
+    setIsLogged(false);
 
     router.replace("/login");
   };
@@ -42,7 +46,7 @@ const Profile = () => {
 
           <InfoBox user={user} />
 
-          {/* {posts.length > 0 ? (
+          {posts.length > 0 ? (
             <FlatList
               data={posts}
               keyExtractor={(item) => item.$id}
@@ -50,7 +54,7 @@ const Profile = () => {
             />
           ) : (
             <Text className="text-center">No posts available</Text> // Thông báo không có bài đăng
-          )} */}
+          )}
         </View>
       ) : (
         <Text className="text-xl mt-4">Loading user...</Text>
