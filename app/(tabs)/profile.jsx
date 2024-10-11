@@ -15,12 +15,13 @@ import InfoBox from "../../components/InfoBox";
 import Trending from "../../components/Trending";
 import { icons } from "../../constants";
 import { router } from "expo-router";
+import ProfileCard from "../../components/ProfileCard";
+import PhotoCards from "../../components/PhotoCards";
 
 const Profile = () => {
   const { user, setUser, setIsLogged } = useGlobalContext(); // Lấy thông tin người dùng từ context
 
   const { data: posts } = useAppwrite(() => getUserPosts(user.$id));
-  console.log("duwxl iêu", posts)
   const logout = async () => {
     await signOut();
     setUser(null);
@@ -30,35 +31,40 @@ const Profile = () => {
   };
 
   return (
-    <SafeAreaView className="h-full my-10">
-      {user ? (
-        <View className="mt-3">
-          <TouchableOpacity
-            className="w-full items-end mb-6 px-4"
-            onPress={logout}
-          >
-            <Image
-              source={icons.logout}
-              className="w-6 h-6"
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
+    <SafeAreaView className="h-full my-4">
+      <ScrollView>
+        {user ? (
+          <View className="mt-3">
+            <TouchableOpacity
+              className="w-full items-end mb-6 px-4"
+              onPress={logout}
+            >
+              <Image
+                source={icons.logout}
+                className="w-6 h-6"
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
 
-          <InfoBox user={user} />
-
-          {posts.length > 0 ? (
+            <InfoBox user={user} />
+            <View className="px-4">
+              <Text className="text-base">Your latest posts</Text>
+              {/* {posts.length > 0 ? (
             <FlatList
               data={posts}
               keyExtractor={(item) => item.$id}
-              renderItem={({ item }) => <Trending posts={posts} />}
+              renderItem={({ item }) => <PhotoCards posts={posts} />}
             />
           ) : (
             <Text className="text-center">No posts available</Text> // Thông báo không có bài đăng
-          )}
-        </View>
-      ) : (
-        <Text className="text-xl mt-4">Loading user...</Text>
-      )}
+          )} */}
+              <ProfileCard posts={posts} />
+            </View>
+          </View>
+        ) : (
+          <Text className="text-xl mt-4">Loading user...</Text>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 };

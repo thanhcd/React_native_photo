@@ -17,12 +17,12 @@ import { createPhoto } from "../../lib/appwrite";
 import { useGlobalContext } from "../../context/GlobalProvider";
 
 const Create = () => {
-  // const { user } = useGlobalContext();
-  // // Kiểm tra nếu user là undefined
-  // if (!user) {
-  //   Alert.alert("User not found", "Please log in again.");
-  //   return null; // Hoặc có thể return một cái gì đó khác để ngăn không cho render
-  // }
+  const { user } = useGlobalContext();
+  // Kiểm tra nếu user là undefined
+  if (!user) {
+    Alert.alert("User not found", "Please log in again.");
+    return null; // Hoặc có thể return một cái gì đó khác để ngăn không cho render
+  }
 
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
