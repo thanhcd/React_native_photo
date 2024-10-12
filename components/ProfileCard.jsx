@@ -1,9 +1,16 @@
-import { View, ScrollView, Image, TouchableOpacity, Modal, Text } from "react-native";
+import {
+  View,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Modal,
+  Text,
+} from "react-native";
 import React, { useState } from "react";
 import CustomButton from "./CustomButton";
 import { icons } from "../constants";
 
-const PhotoCards = ({ posts }) => {
+const ProfileCard = ({ posts }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [visibleCount, setVisibleCount] = useState(6);
 
@@ -33,6 +40,9 @@ const PhotoCards = ({ posts }) => {
               />
             </TouchableOpacity>
           ))}
+
+          {/* Nếu chỉ có 2 ảnh, thêm một View trống để giữ chỗ cho ảnh thứ 3 */}
+          {posts.length === 2 && <View className="w-[30%] my-2" />}
         </View>
 
         {visibleCount < posts.length && (
@@ -87,4 +97,4 @@ const PhotoCards = ({ posts }) => {
   );
 };
 
-export default PhotoCards;
+export default ProfileCard;
