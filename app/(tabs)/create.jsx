@@ -57,7 +57,7 @@ const Create = () => {
   };
 
   const submit = async () => {
-    console.log("Form values:", form); // In giá trị của form ra để kiểm tra
+    // console.log("Form values:", form); // In giá trị của form ra để kiểm tra
 
     if (!form.prompt || !form.thumbnail || !form.title) {
       Alert.alert("Please fill all the fields");

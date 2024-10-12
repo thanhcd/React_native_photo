@@ -35,7 +35,7 @@ const signupname = () => {
     
     if (!form.username || !form.email || !form.password) {
       Alert.alert("Error", "please fill all the fields");
-      console.log("Username:", form.username); // Sửa log cho 'username'
+      // console.log("Username:", form.username); // Sửa log cho 'username'
       return; // Thêm return ở đây để tránh tiếp tục xử lý khi thiếu dữ liệu
     }
     
