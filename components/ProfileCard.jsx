@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import CustomButton from "./CustomButton";
 import { icons } from "../constants";
 import { deletePhoto, checkFileExists } from "../lib/appwrite";
+import { router } from "expo-router";
 
 const ProfileCard = ({ posts }) => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -27,24 +28,44 @@ const ProfileCard = ({ posts }) => {
   const handleDelete = async () => {
     if (selectedImage) {
       try {
-        console.log('ID của document đang cố gắng xóa:', selectedImage.$id); // Log ID của document
+        console.log("ID của document đang cố gắng xóa:", selectedImage.$id); // Log ID của document
         // Gọi hàm deletePhoto với ID của document đã chọn
         await deletePhoto(selectedImage.$id);
         // Nếu xóa thành công, bạn có thể reset selectedImage hoặc thực hiện bất kỳ hành động nào khác
         setSelectedImage(null);
-        console.log('Ảnh đã được xóa thành công');
+        console.log("Ảnh đã được xóa thành công");
       } catch (error) {
-        console.error('Lỗi khi xóa ảnh: ', error);
+        console.error("Lỗi khi xóa ảnh: ", error);
       }
     } else {
-      console.log('Không có ảnh nào được chọn để xóa.');
+      console.log("Không có ảnh nào được chọn để xóa.");
     }
   };
-  
-  
-  const handleUpdate = () => {
-    
-  }
+
+  const handleUpdate = async () => {
+    if (selectedImage) {
+      try {
+        console.log(
+          "ID của document đang cố gắng cập nhật:",
+          selectedImage.$id
+        ); 
+
+        router.push({
+          pathname: "/create",
+          params: {
+            Utitle: selectedImage.title,
+            Uthumbnail: selectedImage.thumbnail,
+            Uprompt: selectedImage.prompt,
+            documentId: selectedImage.$id, // Truyền ID của document
+          },
+        });
+      } catch (error) {
+        console.error("Lỗi khi cố gắng cập nhật ảnh: ", error);
+      }
+    } else {
+      console.log("Không có ảnh nào được chọn để cập nhật.");
+    }
+  };
 
   return (
     <>
@@ -125,7 +146,7 @@ const ProfileCard = ({ posts }) => {
                 />
                 <CustomButton
                   title="UPDATE"
-                  handlePress={() => handleUpdate(selectedImage)} // Viết logic cập nhật ảnh
+                  handlePress={handleUpdate} // Viết logic cập nhật ảnh
                   containerStyles="w-44 h-[15] bg-black border-2 border-white rounded-lg"
                   textStyles="text-white"
                 />
