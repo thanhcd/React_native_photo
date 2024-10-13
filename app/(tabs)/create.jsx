@@ -64,16 +64,24 @@ const Create = () => {
 
   const submit = async () => {
     const { title, thumbnail, prompt } = form;
-
-    if (!title || !thumbnail || !prompt) {
+  
+    if (!title || !prompt) {
       Alert.alert("Please fill all the fields");
       return;
     }
-
+  
     setUploading(true);
     try {
       if (documentId) {
-        await updatePhoto(documentId, { ...form });
+        // Chỉ thêm `thumbnail` nếu có giá trị
+        const updatedData = { title, prompt };
+  
+        // Nếu có thumbnail mới, thêm vào updatedData
+        if (thumbnail) {
+          updatedData.thumbnail = thumbnail;
+        }
+  
+        await updatePhoto(documentId, updatedData);
         Alert.alert("Success", "Post updated");
       } else {
         await createPhoto({ ...form, userId: user.$id });
@@ -87,11 +95,11 @@ const Create = () => {
       setUploading(false);
     }
   };
-
+  
   return (
     <SafeAreaView className="h-full px-4 pt-10">
       <ScrollView>
-        <Text className="text-4xl text-black font-cbold">Create</Text>
+        <Text className="text-4xl text-black font-cbold">{documentId ? ("Update") : ("Create")}</Text>
         <Text className="text-base font-cregular"> your photo post</Text>
 
         <FormField

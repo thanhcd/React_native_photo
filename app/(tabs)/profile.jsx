@@ -49,15 +49,6 @@ const Profile = () => {
             <InfoBox user={user} />
             <View className="px-4">
               <Text className="text-base">Your latest posts</Text>
-              {/* {posts.length > 0 ? (
-            <FlatList
-              data={posts}
-              keyExtractor={(item) => item.$id}
-              renderItem={({ item }) => <PhotoCards posts={posts} />}
-            />
-          ) : (
-            <Text className="text-center">No posts available</Text> // Thông báo không có bài đăng
-          )} */}
               <ProfileCard posts={posts} />
             </View>
           </View>
