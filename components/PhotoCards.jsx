@@ -1,48 +1,77 @@
-import { View, ScrollView, Image, TouchableOpacity, Modal, Text } from "react-native";
+import { View, Image, TouchableOpacity, Modal, Text, ActivityIndicator } from "react-native";
 import React, { useState } from "react";
 import CustomButton from "./CustomButton";
 import { icons } from "../constants";
+import StaggeredList from '@mindinventory/react-native-stagger-view';
 
 const PhotoCards = ({ posts }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [visibleCount, setVisibleCount] = useState(6);
+  const isLoading = false; // Thay đổi này nếu bạn có logic tải
+
+  // Tạo mảng imageURL từ posts
+  const imageURL = posts.slice(0, visibleCount).map((post, index) => ({
+    id: index, // hoặc sử dụng `post.id` nếu có
+    url: post.thumbnail,
+  }));
 
   const handleShowMore = () => {
     setVisibleCount((prevCount) => {
       const newCount = prevCount + 6;
-      // Kiểm tra giá trị và in ra console để kiểm tra
-      // console.log(`visibleCount: ${newCount}, posts.length: ${posts.length}`);
       return newCount > posts.length ? posts.length : newCount; // Đảm bảo không vượt quá số lượng ảnh
     });
   };
 
+  const renderChildren = (item) => {
+    return (
+      <TouchableOpacity
+        key={item.id}
+        style={getChildrenStyle()}
+        onPress={() => setSelectedImage(posts[item.id])} // Lưu ý để lấy post tương ứng\
+        
+      >
+        <Image
+          source={{ uri: item.url }}
+          className="w-full h-full"
+          resizeMode="cover"
+        />
+      </TouchableOpacity>
+    );
+  };
+
+  const getChildrenStyle = () => {
+    return {
+      width: '100%', // Sử dụng width 48% để có khoảng cách đều giữa các phần tử
+      height: Math.random() * 100 + 200, // Chiều cao ngẫu nhiên trong khoảng 150 đến 250
+      padding: 5
+    };
+  };
+
   return (
     <>
-      <ScrollView showsHorizontalScrollIndicator={false}>
-        <View className="flex-row flex-wrap justify-between">
-          {posts.slice(0, visibleCount).map((post, index) => (
-            <TouchableOpacity
-              key={index}
-              className="w-[48%] my-2"
-              onPress={() => setSelectedImage(post)}
-            >
-              <Image
-                source={{ uri: post.thumbnail }}
-                className="w-full h-[180px]"
-                resizeMode="cover"
-              />
-            </TouchableOpacity>
-          ))}
-        </View>
+      <View>
+        <StaggeredList
+          data={imageURL}
+          animationType={'SLIDE_DOWN'}
+          contentContainerStyle={{}} // Thêm padding nếu cần
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => renderChildren(item)}
+          isLoading={isLoading}
+          LoadingView={
+            <View>
+              <ActivityIndicator color={'black'} />
+            </View>
+          }
+        />
+      </View>
 
-        {visibleCount < posts.length && (
-          <CustomButton
-            title="SHOW MORE"
-            handlePress={handleShowMore}
-            containerStyles="w-full mt-7 border-2 border-grey bg-white rounded-lg"
-          />
-        )}
-      </ScrollView>
+      {visibleCount < posts.length && (
+        <CustomButton
+          title="SHOW MORE"
+          handlePress={handleShowMore}
+          containerStyles="w-full mt-7 border-2 border-grey bg-white rounded-lg"
+        />
+      )}
 
       {selectedImage && (
         <Modal
