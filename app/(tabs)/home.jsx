@@ -30,7 +30,7 @@ const Home = () => {
   };
 
   return (
-    <SafeAreaView className="h-full px-4 pt-10">
+    <SafeAreaView className="h-full px-4 pt-10" onRefresh={onRefresh}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={

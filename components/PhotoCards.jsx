@@ -11,7 +11,7 @@ const PhotoCards = ({ posts }) => {
     setVisibleCount((prevCount) => {
       const newCount = prevCount + 6;
       // Kiểm tra giá trị và in ra console để kiểm tra
-      console.log(`visibleCount: ${newCount}, posts.length: ${posts.length}`);
+      // console.log(`visibleCount: ${newCount}, posts.length: ${posts.length}`);
       return newCount > posts.length ? posts.length : newCount; // Đảm bảo không vượt quá số lượng ảnh
     });
   };

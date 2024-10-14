@@ -9,6 +9,8 @@ import {
 import React, { useState } from "react";
 import CustomButton from "./CustomButton";
 import { icons } from "../constants";
+import { deletePhoto, checkFileExists } from "../lib/appwrite";
+import { router } from "expo-router";
 
 const ProfileCard = ({ posts }) => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -18,9 +20,51 @@ const ProfileCard = ({ posts }) => {
     setVisibleCount((prevCount) => {
       const newCount = prevCount + 6;
       // Kiểm tra giá trị và in ra console để kiểm tra
-      console.log(`visibleCount: ${newCount}, posts.length: ${posts.length}`);
+      // console.log(`visibleCount: ${newCount}, posts.length: ${posts.length}`);
       return newCount > posts.length ? posts.length : newCount; // Đảm bảo không vượt quá số lượng ảnh
     });
+  };
+
+  const handleDelete = async () => {
+    if (selectedImage) {
+      try {
+        console.log("ID của document đang cố gắng xóa:", selectedImage.$id); // Log ID của document
+        // Gọi hàm deletePhoto với ID của document đã chọn
+        await deletePhoto(selectedImage.$id);
+        // Nếu xóa thành công, bạn có thể reset selectedImage hoặc thực hiện bất kỳ hành động nào khác
+        setSelectedImage(null);
+        console.log("Ảnh đã được xóa thành công");
+      } catch (error) {
+        console.error("Lỗi khi xóa ảnh: ", error);
+      }
+    } else {
+      console.log("Không có ảnh nào được chọn để xóa.");
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (selectedImage) {
+      try {
+        console.log(
+          "ID của document đang cố gắng cập nhật:",
+          selectedImage.$id
+        ); 
+
+        router.push({
+          pathname: "/create",
+          params: {
+            Utitle: selectedImage.title,
+            Uthumbnail: selectedImage.thumbnail,
+            Uprompt: selectedImage.prompt,
+            documentId: selectedImage.$id, // Truyền ID của document
+          },
+        });
+      } catch (error) {
+        console.error("Lỗi khi cố gắng cập nhật ảnh: ", error);
+      }
+    } else {
+      console.log("Không có ảnh nào được chọn để cập nhật.");
+    }
   };
 
   return (
@@ -66,6 +110,7 @@ const ProfileCard = ({ posts }) => {
               className="w-full h-full"
               resizeMode="contain"
             />
+
             <View className="absolute top-10 left-5 right-5 flex-row items-start justify-between">
               <View className="flex-row items-center">
                 <Image
@@ -89,6 +134,23 @@ const ProfileCard = ({ posts }) => {
               >
                 <Image source={icons.x} />
               </TouchableOpacity>
+            </View>
+
+            {/* Thêm 2 nút Delete và Update ở bên dưới */}
+            <View className="min-h-[150px]">
+              <View className="flex-row justify-between w-full mb-10 px-6">
+                <CustomButton
+                  title="DELETE"
+                  handlePress={handleDelete} // Viết logic xóa ảnh
+                  containerStyles="w-44 h-[15] border-2 border-grey bg-white rounded-lg"
+                />
+                <CustomButton
+                  title="UPDATE"
+                  handlePress={handleUpdate} // Viết logic cập nhật ảnh
+                  containerStyles="w-44 h-[15] bg-black border-2 border-white rounded-lg"
+                  textStyles="text-white"
+                />
+              </View>
             </View>
           </View>
         </Modal>

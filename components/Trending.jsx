@@ -74,9 +74,7 @@ const TrendingItem = ({ activeItem, item, onPress }) => {
                 className="absolute right-1 top-0 z-10" // Đặt nút ở bên phải
                 onPress={() => setSelectedImage(false)}
               >
-                <Image
-                  source={icons.x}
-                />
+                <Image source={icons.x} />
               </TouchableOpacity>
             </View>
           </View>
@@ -90,9 +88,9 @@ const TrendingItem = ({ activeItem, item, onPress }) => {
           {/* Hiển thị ảnh từ URL item.thumbnail */}
           <ImageBackground
             source={{ uri: item.thumbnail }} // URL của ảnh
-            className="w-[380px] h-[350px] my-2 overflow-hidden"
+            className="min-w-[43vh] min-h-[35vh] my-2 overflow-hidden"
             resizeMode="cover" // Căn chỉnh ảnh theo kích thước của ImageBackground
-          />
+          ></ImageBackground>
         </TouchableOpacity>
       )}
 
