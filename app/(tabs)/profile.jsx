@@ -5,8 +5,9 @@ import {
   FlatList,
   ScrollView,
   TouchableOpacity,
+  RefreshControl
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getUserPosts, signOut } from "../../lib/appwrite";
@@ -20,8 +21,14 @@ import PhotoCards from "../../components/PhotoCards";
 
 const Profile = () => {
   const { user, setUser, setIsLogged } = useGlobalContext(); // Lấy thông tin người dùng từ context
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
 
-  const { data: posts } = useAppwrite(() => getUserPosts(user.$id));
+  const { data: posts, refetch } = useAppwrite(() => getUserPosts(user.$id));
   const logout = async () => {
     await signOut();
     setUser(null);
@@ -32,7 +39,10 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="h-full my-4">
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         {user ? (
           <View className="mt-3">
             <TouchableOpacity

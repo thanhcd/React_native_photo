@@ -34,14 +34,14 @@ export default function App() {
             handlePress={() => {
               router.push("/login");
             }}
-            containerStyles="w-44 h-[15] border-2 border-grey  bg-white rounded-lg"
+            containerStyles="w-[49%] h-[15] border-2 border-grey  bg-white rounded-lg"
           />
           <CustomButton
             title="REGISTER"
             handlePress={() => {
               router.push("/signup");
             }}
-            containerStyles="w-44 h-[15] bg-black rounded-lg"
+            containerStyles="w-[49%] h-[15] bg-black rounded-lg"
             textStyles="text-white"
           />
         </View>
