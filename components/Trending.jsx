@@ -26,7 +26,7 @@ const ZoomOut = {
   1: {
     scale: 0.9,
   },
-};
+}; 
 
 const TrendingItem = ({ activeItem, item, onPress }) => {
   const [selectedImage, setSelectedImage] = useState(false);
