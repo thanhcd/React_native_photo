@@ -88,7 +88,7 @@ const TrendingItem = ({ activeItem, item, onPress }) => {
           {/* Hiển thị ảnh từ URL item.thumbnail */}
           <ImageBackground
             source={{ uri: item.thumbnail }} // URL của ảnh
-            className="min-w-[43vh] min-h-[35vh] my-2 overflow-hidden"
+            className="min-w-[45vh] min-h-[35vh] my-2 overflow-hidden"
             resizeMode="cover" // Căn chỉnh ảnh theo kích thước của ImageBackground
           ></ImageBackground>
         </TouchableOpacity>
