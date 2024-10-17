@@ -1,8 +1,16 @@
-import { View, Image, TouchableOpacity, Modal, Text, ActivityIndicator } from "react-native";
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Modal,
+  Text,
+  ActivityIndicator,
+} from "react-native";
 import React, { useState } from "react";
 import CustomButton from "./CustomButton";
 import { icons } from "../constants";
-import StaggeredList from '@mindinventory/react-native-stagger-view';
+import StaggeredList from "@mindinventory/react-native-stagger-view";
+import { getUserInfo } from "../lib/appwrite";
 
 const PhotoCards = ({ posts }) => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -11,7 +19,7 @@ const PhotoCards = ({ posts }) => {
 
   // Tạo mảng imageURL từ posts
   const imageURL = posts.slice(0, visibleCount).map((post, index) => ({
-    id: index, // hoặc sử dụng `post.id` nếu có
+    id: index, // Hoặc sử dụng `post.id` nếu có
     url: post.thumbnail,
   }));
 
@@ -22,13 +30,27 @@ const PhotoCards = ({ posts }) => {
     });
   };
 
+  const handleUserInfo = async (userId) => {
+    if (!userId) {
+      console.warn("User ID is not defined");
+      return; // Trả về nếu không có ID
+    }
+
+    try {
+      const userInfo = await getUserInfo(userId);
+      console.log("User Info:", userInfo);
+      // Thực hiện hành động với userInfo, như hiển thị trong modal hoặc navigation
+    } catch (error) {
+      console.error("Error fetching user info:", error.message);
+    }
+  };
+
   const renderChildren = (item) => {
     return (
       <TouchableOpacity
         key={item.id}
         style={getChildrenStyle()}
-        onPress={() => setSelectedImage(posts[item.id])} // Lưu ý để lấy post tương ứng\
-        
+        onPress={() => setSelectedImage(posts[item.id])} // Lưu ý để lấy post tương ứng
       >
         <Image
           source={{ uri: item.url }}
@@ -41,9 +63,9 @@ const PhotoCards = ({ posts }) => {
 
   const getChildrenStyle = () => {
     return {
-      width: '100%', // Sử dụng width 48% để có khoảng cách đều giữa các phần tử
-      height: Math.random() * 100 + 200, // Chiều cao ngẫu nhiên trong khoảng 150 đến 250
-      padding: 5
+      width: "100%", // Sử dụng width 100% để đảm bảo chiếm hết không gian
+      height: Math.random() * 100 + 200, // Chiều cao ngẫu nhiên trong khoảng 200 đến 300
+      padding: 5,
     };
   };
 
@@ -52,14 +74,14 @@ const PhotoCards = ({ posts }) => {
       <View>
         <StaggeredList
           data={imageURL}
-          animationType={'SLIDE_DOWN'}
+          animationType={"SLIDE_DOWN"}
           contentContainerStyle={{}} // Thêm padding nếu cần
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => renderChildren(item)}
           isLoading={isLoading}
           LoadingView={
             <View>
-              <ActivityIndicator color={'black'} />
+              <ActivityIndicator color={"black"} />
             </View>
           }
         />
@@ -86,21 +108,34 @@ const PhotoCards = ({ posts }) => {
               resizeMode="contain"
             />
             <View className="absolute top-10 left-5 right-5 flex-row items-start justify-between">
-              <View className="flex-row items-center">
-                <Image
-                  source={{ uri: selectedImage.creator.avatar }}
-                  className="w-[40px] h-[40px] rounded-full"
-                  resizeMode="cover"
-                />
-                <View className="flex-col px-2 py-1">
-                  <Text className="font-bold text-white">
-                    {selectedImage.creator.username}
-                  </Text>
-                  <Text className="w-full break-words text-white">
-                    {selectedImage.creator.email.split("@")[0]}@
-                  </Text>
-                </View>
-              </View>
+              {/* Kiểm tra selectedImage.creator trước khi gọi hàm getUserInfo */}
+              {selectedImage.creator && (
+                <TouchableOpacity
+                  onPress={() => {
+                    console.log(
+                      "Calling handleUserInfo with ID:",
+                      selectedImage.creator.username
+                    ); // Thêm log để kiểm tra
+                    handleUserInfo(selectedImage.creator.$id);
+                  }}
+                >
+                  <View className="flex-row items-center">
+                    <Image
+                      source={{ uri: selectedImage.creator.avatar }}
+                      className="w-[40px] h-[40px] rounded-full"
+                      resizeMode="cover"
+                    />
+                    <View className="flex-col px-2 py-1">
+                      <Text className="font-bold text-white">
+                        {selectedImage.creator.username}
+                      </Text>
+                      <Text className="w-full break-words text-white">
+                        {selectedImage.creator.email.split("@")[0]}@
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              )}
 
               <TouchableOpacity
                 className="absolute right-4 top-4"
