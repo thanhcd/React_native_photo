@@ -11,6 +11,7 @@ import CustomButton from "./CustomButton";
 import { icons } from "../constants";
 import StaggeredList from "@mindinventory/react-native-stagger-view";
 import { getUserInfo } from "../lib/appwrite";
+import { router } from "expo-router";
 
 const PhotoCards = ({ posts }) => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -115,8 +116,19 @@ const PhotoCards = ({ posts }) => {
                     console.log(
                       "Calling handleUserInfo with ID:",
                       selectedImage.creator.username
-                    ); // Thêm log để kiểm tra
+                    );
                     handleUserInfo(selectedImage.creator.$id);
+
+                    // Truyền thông tin người dùng tới UserProfile
+                    router.push({
+                      pathname: "chatmessage/UserProfile",
+                      params: {
+                        userId: selectedImage.creator.$id,
+                        username: selectedImage.creator.username,
+                        avatar: selectedImage.creator.avatar,
+                        email: selectedImage.creator.email,
+                      },
+                    });
                   }}
                 >
                   <View className="flex-row items-center">
