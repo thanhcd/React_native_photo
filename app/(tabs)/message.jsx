@@ -19,42 +19,45 @@ const Message = () => {
   const { user, isLoading } = useGlobalContext(); // Lấy thông tin người dùng từ context
   const client = getClient(); // Lấy client Stream Chat
   const [selectedChannel, setSelectedChannel] = useState(null); // State để lưu kênh đã chọn
+  const [isConnected, setIsConnected] = useState(false); // State để theo dõi kết nối người dùng
 
   const handleBackMessage = () => {
     setSelectedChannel(null); 
-  }
+  };
 
   useEffect(() => {
-    const setupStreamChat = async () => {
-      if (user && user.$id) {
-        const userId = user.$id; // ID người dùng từ context
-        const userName = user.username || "User"; // Tên người dùng từ context
-        const userImage =
-          user.avatar || "https://example.com/default-avatar.png"; // Avatar người dùng
-        const userToken = client.devToken(userId); // Sử dụng devToken
-
-        // Kết nối người dùng vào Stream Chat
-        await connectUser(userId, userName, userImage, userToken);
-
-        const newChannel = client.channel("messaging", "the_park", {
-          name: "The Park",
-        });
-
-        // Tạo kênh trên server nếu chưa có
-        try {
-          await newChannel.create();
-          console.log("Channel created successfully:", newChannel);
-        } catch (error) {
-          console.error("Error creating channel:", error);
+    const checkConnect = async () => {
+      try {
+        if (isConnected) {
+          // Ngắt kết nối nếu đã kết nối trước đó
+          await disconnectUser();
+          setIsConnected(false); // Cập nhật trạng thái ngắt kết nối
         }
+
+        if (user && user.$id) {
+          const userId = user.$id; // ID người dùng từ context
+          const userName = user.username || "User"; // Tên người dùng từ context
+          const userImage =
+            user.avatar || "https://example.com/default-avatar.png"; // Avatar người dùng
+          const userToken = client.devToken(userId); // Sử dụng devToken
+
+          // Kết nối người dùng vào Stream Chat
+          await connectUser(userId, userName, userImage, userToken);
+          setIsConnected(true); // Cập nhật trạng thái kết nối thành công
+        }
+      } catch (error) {
+        console.error("Error connecting user:", error.message);
       }
     };
 
-    setupStreamChat();
+    checkConnect();
 
     // Cleanup khi component bị unmount
     return () => {
-      disconnectUser();
+      if (isConnected) {
+        disconnectUser(); // Ngắt kết nối khi component bị hủy
+        setIsConnected(false);
+      }
     };
   }, [user]);
 
@@ -67,8 +70,7 @@ const Message = () => {
       <SafeAreaView className="h-full px-4 pt-10">
         <View className="flex-row flex-row justify-between items-center">
           <Text className="text-4xl font-cbold">Messages</Text>
-          <TouchableOpacity
-          onPress={handleBackMessage}>
+          <TouchableOpacity onPress={handleBackMessage}>
             <Image
               source={icons.leftArrow}
               className="w-6 h-6"
