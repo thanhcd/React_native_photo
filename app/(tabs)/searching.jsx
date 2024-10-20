@@ -25,11 +25,9 @@ const Search = () => {
 
   return (
     //Đéo hiểu sao thằng lồn này lại là pt-16 trong khi mấy trang khác là pt-10
-    <SafeAreaView className="h-full px-4 pt-16"> 
-      <View>
-        <Text className="text-4xl text-black font-cbold">Search</Text>
-        <SearchInput initialQuery={initialQuery} onSearch={handleSearch} />
-      </View>
+    <SafeAreaView className="h-full mx-4 pt-16">
+      <Text className="text-4xl text-black font-cbold">Search</Text>
+      <SearchInput initialQuery={initialQuery} onSearch={handleSearch} />
       <Text className="font-bold font-cregular mt-5">ALL RESULT</Text>
 
       <FlatList
@@ -39,7 +37,6 @@ const Search = () => {
         ListEmptyComponent={() => <EmptyState />}
       />
     </SafeAreaView>
-
   );
 };
 

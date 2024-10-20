@@ -1,36 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView, ScrollView, View, Text, Image } from "react-native";
-import { getUserPosts } from "../../lib/appwrite"; // Hàm gọi API
 import PhotoCards from "../../components/PhotoCards";
 import CustomButton from "../../components/CustomButton";
+import { useGlobalContext } from "../../context/GlobalProvider";
+import { createChannel, connectUser, getClient } from "../../lib/streamchat"; // Import connectUser từ file lib
 
 const UserProfile = () => {
   const router = useRouter();
   const { userId, username, avatar, email } = useLocalSearchParams();
-  const [posts, setPosts] = useState([]);
+  const { user } = useGlobalContext(); // Lấy user đăng nhập từ context
 
-  console.log("User Id", userId);
-  console.log("username", username);
-  console.log("avatar", avatar);
-  console.log("email", email);
+  const handleMessagePress = async () => {
+    try {
+      const client = getClient()
+      const userToken = client.devToken(userId)
+      await connectUser(userId, username, avatar, userToken); 
+      console.log("kết nối thành công")
+    } catch (error) {
+      console.error("Error creating channel:", error);
+    }
+  };
 
-  // useEffect(() => {
-  //   const fetchPosts = async () => {
-  //     if (userId) { // Kiểm tra userId có tồn tại trước khi gọi API
-  //       try {
-  //         const userPosts = await getUserPosts(userId);
-  //         setPosts(userPosts);
-  //         console.log(userPosts)
-  //       } catch (error) {
-  //         console.error("Error fetching posts:", error.message);
-  //       }
-  //     }
-  //   };
-  //   fetchPosts();
-  // }, [userId]);
-
-  // Kiểm tra nếu userId, username, avatar hoặc email không tồn tại
+  // Kiểm tra dữ liệu người dùng cần thiết
   if (!userId || !username || !avatar || !email) {
     return (
       <SafeAreaView className="h-full my-4">
@@ -38,6 +30,7 @@ const UserProfile = () => {
       </SafeAreaView>
     );
   }
+
   return (
     <SafeAreaView className="h-full pt-10 px-4">
       <View className="items-center w-full">
@@ -55,17 +48,13 @@ const UserProfile = () => {
         <View className="justify-center w-full">
           <CustomButton
             title={`FOLLOW ${username}`}
-            handlePress={() => {
-              router.push("/signup");
-            }}
-            containerStyles="w-full h-[50px] bg-black rounded-lg mb-4" // Thêm margin-bottom cho khoảng cách giữa các nút
+            handlePress={() => {}}
+            containerStyles="w-full h-[50px] bg-black rounded-lg mb-4"
             textStyles="text-white"
           />
           <CustomButton
             title="MESSAGE"
-            handlePress={() => {
-              router.push("/login");
-            }}
+            handlePress={handleMessagePress} // Thêm hàm xử lý khi nhấn nút
             containerStyles="w-full h-[50px] border-2 border-grey bg-white rounded-lg"
           />
         </View>
