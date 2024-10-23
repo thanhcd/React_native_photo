@@ -25,37 +25,65 @@ const Message = () => {
     setSelectedChannel(null); 
   };
 
+  // useEffect(() => {
+  //   const checkConnect = async () => {
+  //     try {
+  //       if (isConnected) {
+  //         // Ngắt kết nối nếu đã kết nối trước đó
+  //         await disconnectUser();
+  //         setIsConnected(false); // Cập nhật trạng thái ngắt kết nối
+  //       }
+
+  //       if (user && user.$id) {
+  //         const userId = user.$id; // ID người dùng từ context
+  //         const userName = user.username || "User"; // Tên người dùng từ context
+  //         const userImage =
+  //           user.avatar || "https://example.com/default-avatar.png"; // Avatar người dùng
+  //         const userToken = client.devToken(userId); // Sử dụng devToken
+
+  //         // Kết nối người dùng vào Stream Chat
+  //         await connectUser(userId, userName, userImage, userToken);
+  //         setIsConnected(true); // Cập nhật trạng thái kết nối thành công
+  //       }
+  //     } catch (error) {
+  //       console.error("Error connecting user:", error.message);
+  //     }
+  //   };
+
+  //   checkConnect();
+
+  //   // Cleanup khi component bị unmount
+  //   return () => {
+  //     if (isConnected) {
+  //       disconnectUser(); // Ngắt kết nối khi component bị hủy
+  //       setIsConnected(false);
+  //     }
+  //   };
+  // }, [user]);
+
   useEffect(() => {
     const checkConnect = async () => {
       try {
-        if (isConnected) {
-          // Ngắt kết nối nếu đã kết nối trước đó
-          await disconnectUser();
-          setIsConnected(false); // Cập nhật trạng thái ngắt kết nối
-        }
-
-        if (user && user.$id) {
-          const userId = user.$id; // ID người dùng từ context
-          const userName = user.username || "User"; // Tên người dùng từ context
-          const userImage =
-            user.avatar || "https://example.com/default-avatar.png"; // Avatar người dùng
-          const userToken = client.devToken(userId); // Sử dụng devToken
-
-          // Kết nối người dùng vào Stream Chat
+        // Kiểm tra nếu đã kết nối
+        if (!isConnected && user && user.$id) {
+          const userId = user.$id;
+          const userName = user.username || "User";
+          const userImage = user.avatar || "https://example.com/default-avatar.png";
+          const userToken = client.devToken(userId);
+  
           await connectUser(userId, userName, userImage, userToken);
-          setIsConnected(true); // Cập nhật trạng thái kết nối thành công
+          setIsConnected(true); // Đánh dấu đã kết nối
         }
       } catch (error) {
         console.error("Error connecting user:", error.message);
       }
     };
-
+  
     checkConnect();
-
-    // Cleanup khi component bị unmount
+  
     return () => {
       if (isConnected) {
-        disconnectUser(); // Ngắt kết nối khi component bị hủy
+        disconnectUser();
         setIsConnected(false);
       }
     };
@@ -84,7 +112,7 @@ const Message = () => {
           <ChatComponent>
             <ChannelList
               client={client} // Truyền client vào ChannelList
-              filters={{ type: "messaging" }} // Lọc kênh theo loại messaging
+              filters={{ type: "messaging", members: { $in: [user.$id] }  }} // Lọc kênh theo loại messaging
               sort={{ last_message_at: -1 }} // Sắp xếp kênh theo tin nhắn cuối cùng
               onSelect={(channel) => {
                 console.log("Selected channel:", channel);

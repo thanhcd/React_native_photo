@@ -10,43 +10,74 @@ const UserProfile = () => {
   const router = useRouter();
   const { userId, username, avatar, email } = useLocalSearchParams();
   const { user } = useGlobalContext(); // Lấy user đăng nhập từ context
+  // const handleMessagePress = async () => {
+  //   try {
+  //     const client = getClient(); // Lấy client Stream Chat
+  
+  //     const userToken = client.devToken(userId); // Tạo token cho user mục tiêu
+  
+  //     // Kết nối user mục tiêu vào Stream Chat
+  //     await connectUser(userId, username, avatar, userToken);
+  
+  //     console.log("User connected successfully");
+  
+  //     // Lấy thông tin user hiện tại (đã đăng nhập)
+  //     const currentUserId = user.$id; // ID của user hiện tại từ context
+  //     console.log("Thông tin user đăng nhập:", user);
+  
+  //     // Kiểm tra nếu currentUserId và userId khác nhau trước khi tạo channel
+  //     if (currentUserId !== userId) {
+  //       const channel = await createChannel(currentUserId, userId); // Tạo kênh giữa hai user
+  
+  //       if (channel) {
+  //         console.log("Channel created successfully:", channel);
+  
+  //         // Chuyển hướng đến trang tin nhắn
+  //         router.push({
+  //           pathname: "/message",
+  //           params: { channelId: channel.id }, // Gửi channelId sang trang tin nhắn
+  //         });
+  //       } else {
+  //         console.error("Channel creation failed");
+  //       }
+  //     } else {
+  //       console.error("Không thể tạo channel giữa cùng một user");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error creating channel:", error);
+  //   }
+  // };
   const handleMessagePress = async () => {
     try {
-      const client = getClient(); // Lấy client Stream Chat
+      const client = getClient();
+      const userToken = client.devToken(userId);
   
-      const userToken = client.devToken(userId); // Tạo token cho user mục tiêu
+      // Chỉ kết nối nếu chưa kết nối
+      if (!isConnected) {
+        await connectUser(userId, username, avatar, userToken);
+        console.log("User connected successfully");
+      }
   
-      // Kết nối user mục tiêu vào Stream Chat
-      await connectUser(userId, username, avatar, userToken);
-  
-      console.log("User connected successfully");
-  
-      // Lấy thông tin user hiện tại (đã đăng nhập)
-      const currentUserId = user.$id; // ID của user hiện tại từ context
-      console.log("Thông tin user đăng nhập:", user);
-  
-      // Kiểm tra nếu currentUserId và userId khác nhau trước khi tạo channel
+      const currentUserId = user.$id;
       if (currentUserId !== userId) {
-        const channel = await createChannel(userId, username); // Tạo kênh giữa hai user
-  
+        const channel = await createChannel(currentUserId, userId);
         if (channel) {
           console.log("Channel created successfully:", channel);
-  
-          // Chuyển hướng đến trang tin nhắn
           router.push({
             pathname: "/message",
-            params: { channelId: channel.id }, // Gửi channelId sang trang tin nhắn
+            params: { channelId: channel.id },
           });
         } else {
           console.error("Channel creation failed");
         }
       } else {
-        console.error("Không thể tạo channel giữa cùng một user");
+        console.error("Cannot create channel with the same user");
       }
     } catch (error) {
       console.error("Error creating channel:", error);
     }
   };
+  
   // Kiểm tra dữ liệu người dùng cần thiết
   if (!userId || !username || !avatar || !email) {
     return (
