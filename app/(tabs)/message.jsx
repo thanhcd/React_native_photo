@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, ActivityIndicator, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -13,7 +13,7 @@ import ChatComponent from "../../components/ChatComponent";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { TouchableOpacity } from "react-native";
 import { icons } from "../../constants";
-import { router } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Message = () => {
   const { user, isLoading } = useGlobalContext(); // Lấy thông tin người dùng từ context
@@ -25,69 +25,66 @@ const Message = () => {
     setSelectedChannel(null); 
   };
 
-  // useEffect(() => {
-  //   const checkConnect = async () => {
-  //     try {
-  //       if (isConnected) {
-  //         // Ngắt kết nối nếu đã kết nối trước đó
-  //         await disconnectUser();
-  //         setIsConnected(false); // Cập nhật trạng thái ngắt kết nối
-  //       }
+  // Hiển thị thông tin của thành viên còn lại trong kênh
+  const renderChannelInfo = () => {
+    if (selectedChannel) {
+      const members = selectedChannel.state.members;
+      const currentUserId = user.$id;
 
-  //       if (user && user.$id) {
-  //         const userId = user.$id; // ID người dùng từ context
-  //         const userName = user.username || "User"; // Tên người dùng từ context
-  //         const userImage =
-  //           user.avatar || "https://example.com/default-avatar.png"; // Avatar người dùng
-  //         const userToken = client.devToken(userId); // Sử dụng devToken
+      // Lọc ra đối phương trong kênh
+      const otherMember = Object.values(members).find(
+        (member) => member.user_id !== currentUserId
+      );
 
-  //         // Kết nối người dùng vào Stream Chat
-  //         await connectUser(userId, userName, userImage, userToken);
-  //         setIsConnected(true); // Cập nhật trạng thái kết nối thành công
-  //       }
-  //     } catch (error) {
-  //       console.error("Error connecting user:", error.message);
-  //     }
-  //   };
+      if (otherMember) {
+        return (
+          <View className="flex-row items-center">
+            <Image
+              source={{ uri: otherMember.user.image || "https://example.com/default-avatar.png" }}
+              className="w-10 h-10 rounded-full"
+              resizeMode="cover"
+            />
+            <Text className="text-2xl ml-2">{otherMember.user.name || "Unknown User"}</Text>
+          </View>
+        );
+      } else {
+        return <Text className="text-2xl">No other members</Text>;
+      }
+    }
+    return null;
+  };
 
-  //   checkConnect();
+  // Sử dụng useFocusEffect để xử lý kết nối và ngắt kết nối
+  useFocusEffect(
+    useCallback(() => {
+      const checkConnect = async () => {
+        try {
+          // Kiểm tra nếu đã kết nối
+          if (!isConnected && user && user.$id) {
+            const userId = user.$id;
+            const userName = user.username || "User";
+            const userImage = user.avatar || "https://example.com/default-avatar.png";
+            const userToken = client.devToken(userId);
 
-  //   // Cleanup khi component bị unmount
-  //   return () => {
-  //     if (isConnected) {
-  //       disconnectUser(); // Ngắt kết nối khi component bị hủy
-  //       setIsConnected(false);
-  //     }
-  //   };
-  // }, [user]);
-
-  useEffect(() => {
-    const checkConnect = async () => {
-      try {
-        // Kiểm tra nếu đã kết nối
-        if (!isConnected && user && user.$id) {
-          const userId = user.$id;
-          const userName = user.username || "User";
-          const userImage = user.avatar || "https://example.com/default-avatar.png";
-          const userToken = client.devToken(userId);
-  
-          await connectUser(userId, userName, userImage, userToken);
-          setIsConnected(true); // Đánh dấu đã kết nối
+            await connectUser(userId, userName, userImage, userToken);
+            setIsConnected(true); // Đánh dấu đã kết nối
+          }
+        } catch (error) {
+          console.error("Error connecting user:", error.message);
         }
-      } catch (error) {
-        console.error("Error connecting user:", error.message);
-      }
-    };
-  
-    checkConnect();
-  
-    return () => {
-      if (isConnected) {
-        disconnectUser();
-        setIsConnected(false);
-      }
-    };
-  }, [user]);
+      };
+
+      checkConnect();
+
+      // Hàm cleanup để ngắt kết nối khi tab bị chuyển
+      return () => {
+        if (isConnected) {
+          disconnectUser();
+          setIsConnected(false);
+        }
+      };
+    }, [user, isConnected]) // Sử dụng useCallback để tránh re-render không cần thiết
+  );
 
   if (isLoading) {
     return <ActivityIndicator size="large" color="#0000ff" />; // Hiển thị loading nếu đang tải
@@ -96,7 +93,7 @@ const Message = () => {
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="h-full px-4 pt-10">
-        <View className="flex-row flex-row justify-between items-center">
+        <View className="flex-row justify-between items-center">
           <Text className="text-4xl font-cbold">Messages</Text>
           <TouchableOpacity onPress={handleBackMessage}>
             <Image
@@ -112,7 +109,7 @@ const Message = () => {
           <ChatComponent>
             <ChannelList
               client={client} // Truyền client vào ChannelList
-              filters={{ type: "messaging", members: { $in: [user.$id] }  }} // Lọc kênh theo loại messaging
+              filters={{ type: "messaging", members: { $in: [user.$id] } }} // Lọc kênh theo loại messaging
               sort={{ last_message_at: -1 }} // Sắp xếp kênh theo tin nhắn cuối cùng
               onSelect={(channel) => {
                 console.log("Selected channel:", channel);
@@ -125,6 +122,8 @@ const Message = () => {
           <ChatComponent>
             <Channel channel={selectedChannel}>
               <View className="h-full pb-10">
+                {/* Hiển thị thông tin đối phương */}
+                {renderChannelInfo()}
                 <MessageList />
                 <MessageInput />
               </View>

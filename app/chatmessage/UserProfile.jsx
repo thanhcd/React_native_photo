@@ -1,71 +1,59 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { SafeAreaView, ScrollView, View, Text, Image } from "react-native";
-import PhotoCards from "../../components/PhotoCards";
+import {
+  SafeAreaView,
+  View,
+  Text,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import CustomButton from "../../components/CustomButton";
 import { useGlobalContext } from "../../context/GlobalProvider";
-import { createChannel, connectUser, getClient } from "../../lib/streamchat"; // Import connectUser từ file lib
+import {
+  createChannel,
+  connectUser,
+  getClient,
+  disconnectUser,
+} from "../../lib/streamchat"; // Import connectUser từ file lib
 
 const UserProfile = () => {
   const router = useRouter();
   const { userId, username, avatar, email } = useLocalSearchParams();
   const { user } = useGlobalContext(); // Lấy user đăng nhập từ context
-  // const handleMessagePress = async () => {
-  //   try {
-  //     const client = getClient(); // Lấy client Stream Chat
-  
-  //     const userToken = client.devToken(userId); // Tạo token cho user mục tiêu
-  
-  //     // Kết nối user mục tiêu vào Stream Chat
-  //     await connectUser(userId, username, avatar, userToken);
-  
-  //     console.log("User connected successfully");
-  
-  //     // Lấy thông tin user hiện tại (đã đăng nhập)
-  //     const currentUserId = user.$id; // ID của user hiện tại từ context
-  //     console.log("Thông tin user đăng nhập:", user);
-  
-  //     // Kiểm tra nếu currentUserId và userId khác nhau trước khi tạo channel
-  //     if (currentUserId !== userId) {
-  //       const channel = await createChannel(currentUserId, userId); // Tạo kênh giữa hai user
-  
-  //       if (channel) {
-  //         console.log("Channel created successfully:", channel);
-  
-  //         // Chuyển hướng đến trang tin nhắn
-  //         router.push({
-  //           pathname: "/message",
-  //           params: { channelId: channel.id }, // Gửi channelId sang trang tin nhắn
-  //         });
-  //       } else {
-  //         console.error("Channel creation failed");
-  //       }
-  //     } else {
-  //       console.error("Không thể tạo channel giữa cùng một user");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error creating channel:", error);
-  //   }
-  // };
+  const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // State to track loading
+
   const handleMessagePress = async () => {
+    setIsLoading(true); // Bắt đầu trạng thái loading
     try {
+      const currentUserId = user.$id; // Lấy userId của người đăng nhập
       const client = getClient();
-      const userToken = client.devToken(userId);
-  
-      // Chỉ kết nối nếu chưa kết nối
-      if (!isConnected) {
-        await connectUser(userId, username, avatar, userToken);
-        console.log("User connected successfully");
+
+      // Kiểm tra kết nối, nếu chưa kết nối thì thực hiện kết nối
+      if (!isConnected && currentUserId) {
+        const currentUserId = user.$id;
+        const currentuserName = user.username || "User";
+        const currentuserImage =
+          user.avatar || "https://example.com/default-avatar.png";
+        const userToken = client.devToken(currentUserId);
+
+        await connectUser(currentUserId, currentuserName, currentuserImage, userToken);
+        setIsConnected(true); // Đánh dấu đã kết nối
       }
-  
-      const currentUserId = user.$id;
+
       if (currentUserId !== userId) {
-        const channel = await createChannel(currentUserId, userId);
+        // Tạo kênh giữa user đăng nhập và người mục tiêu
+        const channel = await createChannel(currentUserId, userId, username);
         if (channel) {
           console.log("Channel created successfully:", channel);
+
+          // Nếu bạn cần ngắt kết nối người dùng hiện tại (tùy theo logic dự án của bạn)
+          // await disconnectUser();
+
+          // Chuyển hướng sang trang tin nhắn với channelId
           router.push({
             pathname: "/message",
-            params: { channelId: channel.id },
+            params: { channelId: channel.id }, // Gửi channelId sang trang tin nhắn
           });
         } else {
           console.error("Channel creation failed");
@@ -75,9 +63,11 @@ const UserProfile = () => {
       }
     } catch (error) {
       console.error("Error creating channel:", error);
+    } finally {
+      setIsLoading(false); // Kết thúc trạng thái loading
     }
   };
-  
+
   // Kiểm tra dữ liệu người dùng cần thiết
   if (!userId || !username || !avatar || !email) {
     return (
@@ -108,11 +98,15 @@ const UserProfile = () => {
             containerStyles="w-full h-[50px] bg-black rounded-lg mb-4"
             textStyles="text-white"
           />
-          <CustomButton
-            title="MESSAGE"
-            handlePress={handleMessagePress} // Thêm hàm xử lý khi nhấn nút
-            containerStyles="w-full h-[50px] border-2 border-grey bg-white rounded-lg"
-          />
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <CustomButton
+              title="MESSAGE"
+              handlePress={handleMessagePress} // Thêm hàm xử lý khi nhấn nút
+              containerStyles="w-full h-[50px] border-2 border-grey bg-white rounded-lg"
+            />
+          )}
         </View>
       </View>
     </SafeAreaView>
@@ -120,7 +114,3 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
-
-
-// const result = await channel.addMembers([{user_id: "james_bond"}]);
-// console.log(result.members[0].channel_role) // "channel_member"
