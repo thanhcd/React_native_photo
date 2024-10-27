@@ -59,7 +59,7 @@ const Profile = () => {
             <InfoBox user={user} />
             <View className="px-4">
               <Text className="text-base">Your latest posts</Text>
-              <PhotoCards posts={posts} 
+              <ProfileCard posts={posts} 
               />
             </View>
           </View>

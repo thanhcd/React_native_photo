@@ -136,18 +136,17 @@ const ProfileCard = ({ posts }) => {
               </TouchableOpacity>
             </View>
 
-            {/* Thêm 2 nút Delete và Update ở bên dưới */}
             <View className="min-h-[150px]">
               <View className="flex-row justify-between w-full mb-10 px-6">
                 <CustomButton
                   title="DELETE"
                   handlePress={handleDelete} // Viết logic xóa ảnh
-                  containerStyles="w-44 h-[15] border-2 border-grey bg-white rounded-lg"
+                  containerStyles="w-[49%] h-[15] border-2 border-grey bg-white rounded-lg"
                 />
                 <CustomButton
                   title="UPDATE"
                   handlePress={handleUpdate} // Viết logic cập nhật ảnh
-                  containerStyles="w-44 h-[15] bg-black border-2 border-white rounded-lg"
+                  containerStyles="w-[49%] h-[15] bg-black border-2 border-white rounded-lg"
                   textStyles="text-white"
                 />
               </View>

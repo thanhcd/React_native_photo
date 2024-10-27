@@ -22,30 +22,27 @@ export default function App() {
           />
           <Text className="text-5xl text-black font-cbold">photo</Text>
         </View>
-        <Link href="/home" className="mt-2">
-          go home
-        </Link>
       </View>
-
-      <View className="min-h-[110px] bg-white">
-        <View className="flex-row justify-between w-full mt-5 px-6">
-          <CustomButton
-            title="LOG IN"
-            handlePress={() => {
-              router.push("/login");
-            }}
-            containerStyles="w-[49%] h-[15] border-2 border-grey  bg-white rounded-lg"
-          />
-          <CustomButton
-            title="REGISTER"
-            handlePress={() => {
-              router.push("/signup");
-            }}
-            containerStyles="w-[49%] h-[15] bg-black rounded-lg"
-            textStyles="text-white"
-          />
+        <View className="min-h-[110px] bg-white">
+          <View className="flex-row justify-between w-full mt-5 px-6">
+            <CustomButton
+              title="LOG IN"
+              handlePress={() => {
+                router.push("/login");
+              }}
+              containerStyles="w-[49%] h-[15] border-2 border-grey  bg-white rounded-lg"
+            />
+            <CustomButton
+              title="REGISTER"
+              handlePress={() => {
+                router.push("/signup");
+              }}
+              containerStyles="w-[49%] h-[15] bg-black rounded-lg"
+              textStyles="text-white"
+            />
+          </View>
         </View>
-      </View>
+      
       <StatusBar backgroundColor="#161622" style="light"/>
     </SafeAreaView>
   );
