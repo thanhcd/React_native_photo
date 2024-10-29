@@ -1,7 +1,6 @@
 import { StreamChat } from 'stream-chat';
-
-const API_KEY = 'yev26yzsqh9v';  // Thay bằng API Key từ Stream
-const client = StreamChat.getInstance(API_KEY);
+import {STREAM_API_KEY} from '@env';
+const client = StreamChat.getInstance(STREAM_API_KEY);
 
 // Hàm để kết nối người dùng vào Stream Chat
 export const connectUser = async (userId, userName, userImage, userToken) => {
