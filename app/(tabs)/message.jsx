@@ -22,7 +22,7 @@ const Message = () => {
   const [isConnected, setIsConnected] = useState(false); // State để theo dõi kết nối người dùng
 
   const handleBackMessage = () => {
-    setSelectedChannel(null); 
+    setSelectedChannel(null);
   };
 
   // Hiển thị thông tin của thành viên còn lại trong kênh
@@ -40,11 +40,17 @@ const Message = () => {
         return (
           <View className="flex-row items-center">
             <Image
-              source={{ uri: otherMember.user.image || "https://example.com/default-avatar.png" }}
+              source={{
+                uri:
+                  otherMember.user.image ||
+                  "https://example.com/default-avatar.png",
+              }}
               className="w-10 h-10 rounded-full"
               resizeMode="cover"
             />
-            <Text className="text-2xl ml-2">{otherMember.user.name || "Unknown User"}</Text>
+            <Text className="text-2xl ml-2">
+              {otherMember.user.name || "Unknown User"}
+            </Text>
           </View>
         );
       } else {
@@ -63,7 +69,8 @@ const Message = () => {
           if (!isConnected && user && user.$id) {
             const userId = user.$id;
             const userName = user.username || "User";
-            const userImage = user.avatar || "https://example.com/default-avatar.png";
+            const userImage =
+              user.avatar || "https://example.com/default-avatar.png";
             const userToken = client.devToken(userId);
 
             await connectUser(userId, userName, userImage, userToken);
@@ -95,13 +102,16 @@ const Message = () => {
       <SafeAreaView className="h-full px-4 pt-10">
         <View className="flex-row justify-between items-center">
           <Text className="text-4xl font-cbold">Messages</Text>
-          <TouchableOpacity onPress={handleBackMessage}>
-            <Image
-              source={icons.leftArrow}
-              className="w-6 h-6"
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
+
+          {selectedChannel && ( // Kiểm tra nếu đang ở trong một kênh
+            <TouchableOpacity onPress={handleBackMessage}>
+              <Image
+                source={icons.leftArrow}
+                className="w-6 h-6"
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          )}
         </View>
 
         {!selectedChannel ? (

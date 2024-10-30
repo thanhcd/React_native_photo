@@ -10,6 +10,8 @@ import {
 import React, { useState } from "react";
 import * as Animatable from "react-native-animatable";
 import { icons } from "../constants";
+import { router } from "expo-router";
+import { getUserInfo } from "../lib/appwrite";
 
 const ZoomIn = {
   0: {
@@ -26,7 +28,22 @@ const ZoomOut = {
   1: {
     scale: 0.9,
   },
-}; 
+};
+
+const handleUserInfo = async (userId) => {
+  if (!userId) {
+    console.warn("User ID is not defined");
+    return; // Trả về nếu không có ID
+  }
+
+  try {
+    const userInfo = await getUserInfo(userId);
+    console.log("User Info:", userInfo);
+    // Thực hiện hành động với userInfo, như hiển thị trong modal hoặc navigation
+  } catch (error) {
+    console.error("Error fetching user info:", error.message);
+  }
+};
 
 const TrendingItem = ({ activeItem, item, onPress }) => {
   const [selectedImage, setSelectedImage] = useState(false);
@@ -53,22 +70,42 @@ const TrendingItem = ({ activeItem, item, onPress }) => {
 
             {/* Hiển thị thông tin người dùng */}
             <View className="absolute top-10 left-5 right-5 flex-row items-start justify-between">
-              <View className="flex-row items-center">
-                <Image
-                  source={{ uri: item.creator.avatar }} // Avatar của creator
-                  className="w-[40px] h-[40px] rounded-full"
-                  resizeMode="cover"
-                />
-                <View className="flex-col px-2 py-1">
-                  <Text className="font-bold text-white">
-                    {item.creator.username}
-                  </Text>
-                  <Text className="w-full break-words text-white">
-                    {item.creator.email.split("@")[0]}@
-                  </Text>
-                </View>
-              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  console.log(
+                    "Calling handleUserInfo with ID:",
+                    item.creator.username
+                  );
+                  handleUserInfo(item.creator.$id);
 
+                  // Truyền thông tin người dùng tới UserProfile
+                  router.push({
+                    pathname: "chatmessage/UserProfile",
+                    params: {
+                      userId: item.creator.$id,
+                      username: item.creator.username,
+                      avatar: item.creator.avatar,
+                      email: item.creator.email,
+                    },
+                  });
+                }}
+              >
+                <View className="flex-row items-center">
+                  <Image
+                    source={{ uri: item.creator.avatar }} // Avatar của creator
+                    className="w-[40px] h-[40px] rounded-full"
+                    resizeMode="cover"
+                  />
+                  <View className="flex-col px-2 py-1">
+                    <Text className="font-bold text-white">
+                      {item.creator.username}
+                    </Text>
+                    <Text className="w-full break-words text-white">
+                      {item.creator.email.split("@")[0]}@
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
               {/* Di chuyển nút đóng sang bên phải với absolute */}
               <TouchableOpacity
                 className="absolute right-1 top-0 z-10" // Đặt nút ở bên phải
@@ -88,7 +125,7 @@ const TrendingItem = ({ activeItem, item, onPress }) => {
           {/* Hiển thị ảnh từ URL item.thumbnail */}
           <ImageBackground
             source={{ uri: item.thumbnail }} // URL của ảnh
-            className="min-w-[45vh] min-h-[35vh] my-2 overflow-hidden"
+            className="min-w-[43vh] min-h-[35vh] my-2 overflow-hidden"
             resizeMode="cover" // Căn chỉnh ảnh theo kích thước của ImageBackground
           ></ImageBackground>
         </TouchableOpacity>
