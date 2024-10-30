@@ -26,7 +26,7 @@ const SearchInput = ({ initialQuery, onSearch }) => {
     >
       <TextInput
         className="text-base mt-0.5 flex-1 font-pregular"
-        placeholder="Search for photo"
+        placeholder="Search for photo by title"
         value={query} // Bind the value to query
         onChangeText={(e) => setQuery(e)}
       />

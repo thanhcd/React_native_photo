@@ -66,7 +66,7 @@ const Message = () => {
       const checkConnect = async () => {
         try {
           // Kiểm tra nếu đã kết nối
-          if (!isConnected && user && user.$id) {
+          if (!isConnected && user) {
             const userId = user.$id;
             const userName = user.username || "User";
             const userImage =
@@ -117,15 +117,19 @@ const Message = () => {
         {!selectedChannel ? (
           // Hiển thị danh sách kênh nếu chưa có kênh nào được chọn
           <ChatComponent>
-            <ChannelList
-              client={client} // Truyền client vào ChannelList
-              filters={{ type: "messaging", members: { $in: [user.$id] } }} // Lọc kênh theo loại messaging
-              sort={{ last_message_at: -1 }} // Sắp xếp kênh theo tin nhắn cuối cùng
-              onSelect={(channel) => {
-                console.log("Selected channel:", channel);
-                setSelectedChannel(channel); // Cập nhật kênh đã chọn
-              }}
-            />
+            {user ? ( // Kiểm tra xem user có tồn tại hay không
+              <ChannelList
+                client={client} // Truyền client vào ChannelList
+                filters={{ type: "messaging", members: { $in: [user.$id] } }} // Lọc kênh theo loại messaging
+                sort={{ last_message_at: -1 }} // Sắp xếp kênh theo tin nhắn cuối cùng
+                onSelect={(channel) => {
+                  console.log("Selected channel:", channel);
+                  setSelectedChannel(channel); // Cập nhật kênh đã chọn
+                }}
+              />
+            ) : (
+              <Text>Vui lòng đăng nhập để xem danh sách kênh</Text> // Thông báo khi user không tồn tại
+            )}
           </ChatComponent>
         ) : (
           // Hiển thị danh sách tin nhắn và input khi đã chọn kênh
