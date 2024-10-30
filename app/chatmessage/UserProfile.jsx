@@ -92,12 +92,12 @@ const UserProfile = () => {
       </View>
       <View className="min-h-[30vh] mt-8">
         <View className="justify-center w-full">
-          <CustomButton
+          {/* <CustomButton
             title={`FOLLOW ${username}`}
             handlePress={() => {}}
             containerStyles="w-full h-[50px] bg-black rounded-lg mb-4"
             textStyles="text-white"
-          />
+          /> */}
           {isLoading ? (
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
