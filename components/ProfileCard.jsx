@@ -48,7 +48,10 @@ const ProfileCard = ({ posts }) => {
         console.log(
           "ID của document đang cố gắng cập nhật:",
           selectedImage.$id
-        ); 
+        );
+
+        // Tắt modal trước khi chuyển trang
+        setSelectedImage(null); // Đặt lại selectedImage
 
         router.push({
           pathname: "/create",
@@ -56,7 +59,7 @@ const ProfileCard = ({ posts }) => {
             Utitle: selectedImage.title,
             Uthumbnail: selectedImage.thumbnail,
             Uprompt: selectedImage.prompt,
-            documentId: selectedImage.$id, // Truyền ID của document
+            documentId: selectedImage.$id,
           },
         });
       } catch (error) {
